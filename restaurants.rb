@@ -34,14 +34,7 @@ if is_create
                             # closed:                 false,
                             )
 
-  first_skipped = false
-
-  CSV.foreach(File.join(ARGV[0], 'restaurants.csv')) do |row|
-    unless first_skipped
-      first_skipped = true
-      next
-    end
-    
+  CSV.foreach(File.join(ARGV[0], 'restaurants.csv'), headers: true) do |row|
     restaurants << {
       name:                   row[1],
       property:               row[2],
