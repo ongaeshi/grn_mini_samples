@@ -75,18 +75,22 @@ if restaurants.size == 0 && ratings.size == 0
   CSV.foreach(File.join(ARGV[0], 'ratings.csv'), headers: true) do |row|
     ratings[row[0]] = {
       restaurant_id:    row[1],
-      # total:            row[3],
-      # food:             row[4],
-      # service:          row[5],
-      # atmosphere:       row[6],
-      # cost_performance: row[7],
+      total:            row[3],
+      food:             row[4],
+      service:          row[5],
+      atmosphere:       row[6],
+      cost_performance: row[7],
       title:            row[8],
       body:             row[9],
-      # created_on:       row[11],
+      created_on:       row[11],
     }
   end
   
 end
+
+# ratings.each do |a|
+#   p a.attributes
+# end
 
 # p restaurants['310595'].attributes
 # p restaurants['10237'].attributes
@@ -100,11 +104,15 @@ end
 # p restaurants[156445].attributes
 # p restaurants[156445-1].attributes
 
-restaurants.select("address:@新宿 name:@ラーメン name:@九州").each do |record|
-  p record.attributes
-end
+# restaurants.select("address:@新宿 name:@ラーメン name:@九州").each do |record|
+#   p record.attributes
+# end
 
-ratings.select("body:@びっくり body:@ラーメン body:@味噌 body:@醤油").each do |record|
-  p record.attributes
-end
+# ratings.select("body:@びっくり body:@ラーメン body:@味噌 body:@醤油").each do |record|
+#   p [record.title, record.restaurant_id.name]
+# end
+
+# ratings.select("restaurant_id.name:@大将").each do |record|
+#   p record.restaurant_id.name
+# end
 
