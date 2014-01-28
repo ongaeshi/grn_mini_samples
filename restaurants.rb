@@ -8,11 +8,10 @@
 require 'grn_mini'
 require 'csv'
 
-is_create = GrnMini::create_or_open("restaurants.db")
+GrnMini::create_or_open("restaurants.db")
 restaurants = GrnMini::Hash.new("Restaurants")
 ratings     = GrnMini::Hash.new("Ratings")
 
-# if is_create
 if restaurants.size == 0 && ratings.size == 0
   restaurants.setup_columns(name:                   "レストラン",
                             property:               "",
@@ -23,9 +22,9 @@ if restaurants.size == 0 && ratings.size == 0
                             # north_latitude:         xxx,
                             # east_longitude:         xxx,
                             description:            "詳細",
-                            # open_morning:           false,
-                            # open_lunch:             false,
-                            # open_late:              false,
+                            open_morning:           false,
+                            open_lunch:             false,
+                            open_late:              false,
                             photo_count:            0,
                             special_count:          0,
                             menu_count:             0,
@@ -33,7 +32,7 @@ if restaurants.size == 0 && ratings.size == 0
                             access_count:           0,
                             created_on:             Time.new,
                             modified_on:            Time.new,
-                            # closed:                 false,
+                            closed:                 false,
                             )
 
   ratings.setup_columns(restaurant_id:    restaurants,
@@ -57,18 +56,18 @@ if restaurants.size == 0 && ratings.size == 0
       address:                row[22],
       # north_latitude:         xxx,
       # east_longitude:         xxx,
-      description:            row[25],
-      # open_morning:           false,
-      # open_lunch:             false,
-      # open_late:              false,
-      # photo_count:            0,
-      # special_count:          0,
-      # menu_count:             0,
-      # fan_count:              0,
-      # access_count:           0,
-      # created_on:             Time.new,
-      # modified_on:            Time.new,
-      # closed:                 false,
+      description:            row["description"],
+      open_morning:           row["open_morning"],
+      open_lunch:             row["open_lunch"],
+      open_late:              row["open_late"],
+      photo_count:            row["photo_count"],
+      special_count:          row["special_count"],
+      menu_count:             row["menu_count"],
+      fan_count:              row["fan_count"],
+      access_count:           row["access_count"],
+      created_on:             row["created_on"],
+      modified_on:            row["modified_on"],
+      closed:                 row["closed"],
     }
   end
 
@@ -92,8 +91,8 @@ end
 #   p a.attributes
 # end
 
-# p restaurants['310595'].attributes
-# p restaurants['10237'].attributes
+p restaurants['310595'].attributes
+p restaurants['10237'].attributes
 
 # p ratings['66111'].attributes
 
@@ -104,9 +103,9 @@ end
 # p restaurants[156445].attributes
 # p restaurants[156445-1].attributes
 
-# restaurants.select("address:@新宿 name:@ラーメン name:@九州").each do |record|
-#   p record.attributes
-# end
+restaurants.select("address:@新宿 name:@ラーメン name:@九州").each do |record|
+  p record.attributes
+end
 
 # ratings.select("body:@びっくり body:@ラーメン body:@味噌 body:@醤油").each do |record|
 #   p [record.title, record.restaurant_id.name]
@@ -116,3 +115,6 @@ end
 #   p record.restaurant_id.name
 # end
 
+restaurants.sort([{key: "fan_count", order: :desc}, {key: "access_count", order: :desc}]).take(10).each do |r|
+  p [r.name, r.access_count, r.fan_count]
+end
