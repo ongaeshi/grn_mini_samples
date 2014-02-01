@@ -78,25 +78,27 @@ if restaurants.size == 0
       closed:                 row[37],
     }
   end
-
+  
   puts "Input ratings.."
 
   CSV.foreach(File.join(ARGV[0], 'ratings.csv'), headers: true) do |row|
     begin
-      ratings[row[0]] = {
-        restaurant_id:    row[1],
-        total:            row[3],
-        food:             row[4],
-        service:          row[5],
-        atmosphere:       row[6],
-        cost_performance: row[7],
-        title:            row[8],
-        body:             row[9],
-        created_on:       row[11],
-      }
-    rescue
-      p row
+      created_on = Time.parse(row[11])
+    rescue ArgumentError
+      created_on = Time.at(0)
     end
+
+    ratings[row[0]] = {
+      restaurant_id:    row[1],
+      total:            row[3],
+      food:             row[4],
+      service:          row[5],
+      atmosphere:       row[6],
+      cost_performance: row[7],
+      title:            row[8],
+      body:             row[9],
+      created_on:       created_on,
+    }
   end
   
   puts "Input complete : #{restaurants.size} restaurants, #{ratings.size} ratings."
