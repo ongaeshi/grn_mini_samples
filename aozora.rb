@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# require_relative './grn_array'
 require 'grn_mini'
 require 'find'
 require 'kconv'
@@ -9,7 +7,8 @@ def read_file(filename)
   Kconv.kconv(text, Kconv::UTF8).gsub("\r\n", "\n")
 end
 
-array = GrnMini::Array.new("db/aozora2.db")
+GrnMini::create_or_open("aozora.db")
+array = GrnMini::Array.new
 
 if array.empty?
   # Input
@@ -29,7 +28,8 @@ if array.empty?
 else
   # Search
   unless ARGV.empty?
-    results = array.select(ARGV.join(" "))
+    query = ARGV.map { |arg| "text:@#{arg}" }.join(" ")
+    results = array.select(query)
     puts "#{results.size} matches"
     snippet = GrnMini::Util::text_snippet_from_selection_results(results)
 
