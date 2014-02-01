@@ -72,6 +72,7 @@ class Search
 
       @header = "<span>#{page_entries.n_records} hit. (#{page_entries.start_offset} - #{page_entries.end_offset})</span>"
       @content = elements.join("\n")
+      @pagination = ""
 
       if page_entries.n_pages > 1
         @pagination += page_link(@page - 1, "&lt;-") + "&nbsp;" if @page > 1
