@@ -103,50 +103,49 @@ if restaurants.size == 0
 
 else
   # Search
-  # unless ARGV.empty?
-  #   results = array.select(ARGV.join(" "))
-  #   puts "#{results.size} matches"
-  #   snippet = GrnMini::Util::text_snippet_from_selection_results(results)
+  unless ARGV.empty?
+    unless ARGV[0] == "-r"
+      # Search name, address
+      query = ARGV.map { |arg|
+        "(" +
+        "name:@#{arg}" +
+        " OR name_kana:@#{arg}" +
+        " OR address:@#{arg}" + 
+        ")"
+      }.join(" ")
 
-  #   results.each do |record|
-  #     puts "--- #{record.filename} ---"
-  #     snippet.execute(record.text).each do |segment|
-  #       puts segment.gsub("\n", "")
-  #     end
-  #   end
-  # end
+      results = restaurants.select(query)
+      
+      results = results.sort([{key: "fan_count", order: :desc}, {key: "access_count", order: :desc}])
 
-  
-  # # ratings.each do |a|
-  # #   p a.attributes
-  # # end
+      results.take(20).each do |record|
+        puts "#{record.name} - #{record.address}"
+      end
+    else
+      # Search review
+      ARGV.shift
+      
+      query = ARGV.map { |arg|
+        "(" +
+        "title:@#{arg}" +
+        " OR body:@#{arg}" + 
+        ")"
+      }.join(" ")
 
-  # p restaurants['310595'].attributes
-  # p restaurants['10237'].attributes
+      # p query
 
-  # # p ratings['66111'].attributes
+      results = ratings.select(query)
+      snippet = GrnMini::Util::text_snippet_from_selection_results(results)
 
-  # # p restaurants[1].attributes
-  # # p restaurants[4].attributes
-  # # p restaurants[2583].attributes
-  # # p restaurants[2583-1].attributes
-  # # p restaurants[156445].attributes
-  # # p restaurants[156445-1].attributes
+      results = results.sort([{key: "restaurant_id.fan_count", order: :desc}, {key: "restaurant_id.access_count", order: :desc}])
 
-  # restaurants.select("address:@新宿 name:@ラーメン name:@九州").each do |record|
-  #   p record.attributes
-  # end
-
-  # # ratings.select("body:@びっくり body:@ラーメン body:@味噌 body:@醤油").each do |record|
-  # #   p [record.title, record.restaurant_id.name]
-  # # end
-
-  # # ratings.select("restaurant_id.name:@大将").each do |record|
-  # #   p record.restaurant_id.name
-  # # end
-
-  # restaurants.sort([{key: "fan_count", order: :desc}, {key: "access_count", order: :desc}]).take(10).each do |r|
-  #   p [r.name, r.access_count, r.fan_count]
-  # end
+      results.take(20).each do |record|
+        puts "--- #{record.restaurant_id.name} - #{record.restaurant_id.address} ---"
+        snippet.execute(record.body).each do |segment|
+          puts segment.gsub("\n", "")
+        end
+      end
+    end
+  end
 end
 
