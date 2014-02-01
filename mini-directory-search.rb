@@ -54,7 +54,7 @@ class Search
       @content    = ""
       @pagination = ""
     else
-      results = @array.select(@params[:query])
+      results = @array.select(@params[:query], default_column: "text")
 
       page_entries = results.paginate([["_score", :desc]], :page => @page, :size => 20)
       snippet = GrnMini::Util::html_snippet_from_selection_results(results, "<strong style=\"background-color: #FFEE55\">", "</strong>")
@@ -88,7 +88,7 @@ class Search
       end
     end
   end
-
+  
   def page_range(page_entries)
     first_diff = [5 - (@page - 1), 0].max
     last_diff  = [5 - (page_entries.n_pages - @page), 0].max
@@ -120,7 +120,8 @@ end
 
 ### main ###
 configure do
-  $array = GrnMini::Array.new("mini-directory-search.db")
+  GrnMini::create_or_open("mini-directory-search.db")
+  $array = GrnMini::Array.new
   Input.from_dir($array) if $array.empty?
 end
 
