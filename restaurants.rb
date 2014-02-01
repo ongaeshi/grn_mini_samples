@@ -3,7 +3,8 @@
 # [Usage]
 # 1. Download from http://blog.livedoor.jp/techblog/archives/65836960.html
 # 2. Extract ldgourmet.tar.gz
-# 3. $ ruby restaurants.rb /path/to/ldgourmet/
+# 3. $ ruby restaurants.rb /path/to/ldgourmet/ (Create database)
+# 4. $ ruby restaurants.rb 'ラーメン とんこつ' (Search from database)
 
 require 'grn_mini'
 require 'csv'
@@ -12,7 +13,12 @@ GrnMini::create_or_open("restaurants.db")
 restaurants = GrnMini::Hash.new("Restaurants")
 ratings     = GrnMini::Hash.new("Ratings")
 
-if restaurants.size == 0 && ratings.size == 0
+if restaurants.size == 0
+  if ARGV.empty?
+    puts "restaurants.rb [input_dir]"
+    exit
+  end
+
   restaurants.setup_columns(name:                   "レストラン",
                             property:               "",
                             alphabet:               "RESTAURANT",
@@ -46,6 +52,8 @@ if restaurants.size == 0 && ratings.size == 0
                         created_on:       Time.now,
                         )
 
+  puts "Input restaurants.."
+
   CSV.foreach(File.join(ARGV[0], 'restaurants.csv'), headers: true) do |row|
     restaurants[row[0]] = {
       name:                   row[1],
@@ -71,50 +79,74 @@ if restaurants.size == 0 && ratings.size == 0
     }
   end
 
+  puts "Input ratings.."
+
   CSV.foreach(File.join(ARGV[0], 'ratings.csv'), headers: true) do |row|
-    ratings[row[0]] = {
-      restaurant_id:    row[1],
-      total:            row[3],
-      food:             row[4],
-      service:          row[5],
-      atmosphere:       row[6],
-      cost_performance: row[7],
-      title:            row[8],
-      body:             row[9],
-      created_on:       row[11],
-    }
+    begin
+      ratings[row[0]] = {
+        restaurant_id:    row[1],
+        total:            row[3],
+        food:             row[4],
+        service:          row[5],
+        atmosphere:       row[6],
+        cost_performance: row[7],
+        title:            row[8],
+        body:             row[9],
+        created_on:       row[11],
+      }
+    rescue
+      p row
+    end
   end
   
+  puts "Input complete : #{restaurants.size} restaurants, #{ratings.size} ratings."
+
+else
+  # Search
+  # unless ARGV.empty?
+  #   results = array.select(ARGV.join(" "))
+  #   puts "#{results.size} matches"
+  #   snippet = GrnMini::Util::text_snippet_from_selection_results(results)
+
+  #   results.each do |record|
+  #     puts "--- #{record.filename} ---"
+  #     snippet.execute(record.text).each do |segment|
+  #       puts segment.gsub("\n", "")
+  #     end
+  #   end
+  # end
+
+  
+  # # ratings.each do |a|
+  # #   p a.attributes
+  # # end
+
+  # p restaurants['310595'].attributes
+  # p restaurants['10237'].attributes
+
+  # # p ratings['66111'].attributes
+
+  # # p restaurants[1].attributes
+  # # p restaurants[4].attributes
+  # # p restaurants[2583].attributes
+  # # p restaurants[2583-1].attributes
+  # # p restaurants[156445].attributes
+  # # p restaurants[156445-1].attributes
+
+  # restaurants.select("address:@新宿 name:@ラーメン name:@九州").each do |record|
+  #   p record.attributes
+  # end
+
+  # # ratings.select("body:@びっくり body:@ラーメン body:@味噌 body:@醤油").each do |record|
+  # #   p [record.title, record.restaurant_id.name]
+  # # end
+
+  # # ratings.select("restaurant_id.name:@大将").each do |record|
+  # #   p record.restaurant_id.name
+  # # end
+
+  # restaurants.sort([{key: "fan_count", order: :desc}, {key: "access_count", order: :desc}]).take(10).each do |r|
+  #   p [r.name, r.access_count, r.fan_count]
+  # end
 end
 
-# ratings.each do |a|
-#   p a.attributes
-# end
-
-p restaurants['310595'].attributes
-p restaurants['10237'].attributes
-
-# p ratings['66111'].attributes
-
-# p restaurants[1].attributes
-# p restaurants[4].attributes
-# p restaurants[2583].attributes
-# p restaurants[2583-1].attributes
-# p restaurants[156445].attributes
-# p restaurants[156445-1].attributes
-
-restaurants.select("address:@新宿 name:@ラーメン name:@九州").each do |record|
-  p record.attributes
-end
-
-# ratings.select("body:@びっくり body:@ラーメン body:@味噌 body:@醤油").each do |record|
-#   p [record.title, record.restaurant_id.name]
-# end
-
-# ratings.select("restaurant_id.name:@大将").each do |record|
-#   p record.restaurant_id.name
-# end
-
-restaurants.sort([{key: "fan_count", order: :desc}, {key: "access_count", order: :desc}]).take(10).each do |r|
-  p [r.name, r.access_count, r.fan_count]
-end
